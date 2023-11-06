@@ -5,7 +5,7 @@ FROM python:3.9
 WORKDIR /server
 
 # Copy your Flask application script and its dependencies
-COPY . /server
+COPY server/ /server
 
 # Install Flask and other dependencies if needed
 RUN pip install -r requirements.txt
