@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <link rel="icon" href="/static/favicon.png" />
+
+        <title>QarabagTeam Farm - Server</title>
+
+        <link href="/static/css/bootswatch-flatly.css" rel="stylesheet" />
+        <link href="/static/css/style.css" rel="stylesheet" />
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-0" style="width:100vw;">
+            <img class="logo" src="/static/img/qbt.png" />
+            <div class="navbar-brand">QBT Farm</div>
+        </nav>
+
+        <div class="container mt-4">
+            <div class="row mb-4">
+                <div class="col-lg-8">
+                    <div class="card border-dark">
+                        <div class="card-body">
+                            <h4 class="card-title">Show Flags</h4>
+                            <form id="show-flags-form">
+                                <div class="row mb-2">
+                                    <div class="col-md-4">
+                                        <label for="sploit-select"
+                                            >Sploit</label
+                                        >
+                                        <select
+                                            class="form-control form-control-sm"
+                                            id="sploit-select"
+                                            name="sploit"
+                                        >
+                                            <option value="">All</option>
+                                            {% for item in
+                                            distinct_values['sploit'] %}
+                                            <option>{{ item }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="team-select">Team</label>
+                                        <select
+                                            class="form-control form-control-sm"
+                                            id="team-select"
+                                            name="team"
+                                        >
+                                            <option value="">All</option>
+                                            {% for item in
+                                            distinct_values['team'] %}
+                                            <option>{{ item }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="flag-input">
+                                            Flag
+                                            <small class="text-muted ml-2"
+                                                >substring,
+                                                case-insensitive</small
+                                            >
+                                        </label>
+                                        <input
+                                            type="text"
+                                            class="form-control form-control-sm"
+                                            id="flag-input"
+                                            name="flag"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <label for="time-since-input">
+                                            Since
+                                            <small class="text-muted ml-2"
+                                                >{{ server_tz_name }}</small
+                                            >
+                                        </label>
+                                        <input
+                                            type="text"
+                                            class="form-control form-control-sm"
+                                            id="time-since-input"
+                                            name="time-since"
+                                            placeholder="yyyy-mm-dd hh:mm"
+                                        />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="time-until-input">
+                                            Until
+                                            <small class="text-muted ml-2"
+                                                >{{ server_tz_name }}</small
+                                            >
+                                        </label>
+                                        <input
+                                            type="text"
+                                            class="form-control form-control-sm"
+                                            id="time-until-input"
+                                            name="time-until"
+                                            placeholder="yyyy-mm-dd hh:mm"
+                                        />
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="status-select"
+                                            >Status</label
+                                        >
+                                        <select
+                                            class="form-control form-control-sm"
+                                            id="status-select"
+                                            name="status"
+                                        >
+                                            <option value="">All</option>
+                                            {% for item in
+                                            distinct_values['status'] %}
+                                            <option>{{ item }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="checksystem-response-input">
+                                            Checksystem response
+                                        </label>
+                                        <input
+                                            type="text"
+                                            class="form-control form-control-sm"
+                                            id="checksystem-response-input"
+                                            name="checksystem_response"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <button
+                                            type="submit"
+                                            class="btn btn-primary btn-sm submit-btn"
+                                        >
+                                            Show
+                                        </button>
+                                        
+                                    </div>
+                                </div>
+                                <input
+                                    type="hidden"
+                                    value="1"
+                                    id="page-number"
+                                    name="page-number"
+                                />
+                            </form>
+                            <button style="margin-top: 10px;" class="btn btn-badge-danger btn-sm btn-show-graph">
+                                Show graph
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card border-dark">
+                        <div class="card-body">
+                            <h4 class="card-title">Add Flags Manually</h4>
+                            <form id="post-flags-manual-form">
+                                <label for="text-with-flags">
+                                    Text with flags
+                                    <small class="text-muted ml-2"
+                                        >flag format: {{ flag_format }}</small
+                                    >
+                                </label>
+                                <textarea
+                                    class="form-control form-control-sm mb-3"
+                                    id="text-with-flags"
+                                    name="text"
+                                ></textarea>
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    Send
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3 text-center query-status"></div>
+
+            <div class="search-results" style="display: none;">
+                <p style="font-weight: 700;display:inline-block;">Found <span class="total-count"></span> flags</p>
+                <p style="font-weight: 700;display: inline-block;margin-left: 50px;">Accepted <span class="total-accepted-count"></span> flags</p>
+                <p style="font-weight: 700;display: inline-block;margin-left: 50px;">Skipped/Queued <span class="total-skipped-count"></span> flags</p>
+
+                <ul class="pagination pagination-sm"></ul>
+
+                <table class="table table-hover border-dark" style="margin: 0 auto;">
+                    <thead>
+                        <tr class="table-secondary">
+                            <th scope="col">Sploit</th>
+                            <th scope="col">Team</th>
+                            <th scope="col">Flag</th>
+                            <th scope="col">Time</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Response</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+               <!-- <ul class="pagination pagination-sm"></ul> -->
+            </div>
+            
+            <canvas id="container-graph-canvas">
+            </canvas>    
+        </div>
+        
+
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="/static/js/jquery.min.js"></script>
+        <script src="/static/js/ui.js"></script>
+    </body>
+</html>

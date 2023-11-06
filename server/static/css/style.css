@@ -1,0 +1,26 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,700");
+
+.navbar-brand {
+    font-family: "Consolas" "sans-serif";
+    font-size: 21px;
+    font-weight: 300;
+    padding: 15px 15px;
+}
+
+.logo {
+    height: 50px;
+}
+
+.table td {
+    font-size: 12px;
+    padding: 0.65rem 0.75rem;
+}
+
+textarea {
+    resize: none;
+}
+
+#text-with-flags {
+    height: 80px;
+}
+
