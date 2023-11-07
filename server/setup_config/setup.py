@@ -1,5 +1,5 @@
 
-from server.config import CONFIG
+from server import CONFIG
 
 
 def update_config(config):
