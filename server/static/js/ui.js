@@ -1,5 +1,6 @@
 var chart = null;
 var flags = [];
+var skipped_or_rejected_flags = [];
 var time = [];
 var split_time = [];
 var hours;
@@ -36,29 +37,27 @@ function generateFlagTableRows(rows) {
             item.status,
             item.checksystem_response !== null ? item.checksystem_response : ''
         ];
-        
-        if(item?.status === 'ACCEPTED') {
+
+        if (item?.status === 'ACCEPTED') {
             html += '<tr style="box-shadow:inset 0px 0px 5px 5px rgba(0,200,0,0.5);">';
             cells.forEach(function (text) {
                 html += '<td style="font-weight:700;">' + escapeHtml(text) + '</td>';
             });
             html += '</tr>';
-        }
-        else if(item?.status === 'QUEUED') {
+        } else if (item?.status === 'QUEUED') {
             html += '<tr style="box-shadow:inset 0px 0px 5px 5px rgba(0,0,0,0.5);">';
             cells.forEach(function (text) {
-            html += '<td style="font-weight:700;">' + escapeHtml(text) + '</td>';
+                html += '<td style="font-weight:700;">' + escapeHtml(text) + '</td>';
             });
             html += '</tr>';
-        }
-        else {
+        } else {
             html += '<tr style="box-shadow:inset 0px 0px 5px 5px rgba(200,0,0,0.5);">';
             cells.forEach(function (text) {
-            html += '<td style="font-weight:700;">' + escapeHtml(text) + '</td>';
+                html += '<td style="font-weight:700;">' + escapeHtml(text) + '</td>';
             });
             html += '</tr>';
         }
-        
+
     });
     return html;
 }
@@ -77,13 +76,13 @@ function generatePaginator(totalCount, rowsPerPage, pageNumber) {
         var extraClasses = (i === pageNumber ? "active" : "");
         html += '<li class="page-item ' + extraClasses + '">' +
             '<a class="page-link" href="#" data-content="' + i + '">' + i + '</a>' +
-        '</li>';
+            '</li>';
     }
 
     if (lastShown < totalPages)
         html += '<li class="page-item">' +
             '<a class="page-link" href="#" data-content="' + totalPages + '">»</a>' +
-        '</li>';
+            '</li>';
     return html;
 }
 
@@ -133,7 +132,7 @@ function showFlags() {
             queryInProgress = false;
         });
 
-        
+
 }
 
 
@@ -150,7 +149,7 @@ function postFlagsManual() {
             sploitSelect.val('Manual');
 
             $('#team-select, #flag-input, #time-since-input, #time-until-input, ' +
-              '#status-select, #checksystem-response-input').val('');
+                '#status-select, #checksystem-response-input').val('');
 
             queryInProgress = false;
             showFlags();
@@ -162,44 +161,57 @@ function postFlagsManual() {
 }
 
 
-
 function showGraphic() {
-    $('.btn-show-graph').attr('disabled',true)
-   
+    $('.btn-show-graph').attr('disabled', true)
+
     $.get('/ui/get_info')
-        .done(function(response) {
+        .done(function (response) {
             split_time = [];
             time = [];
             time = response.time;
-            for(let t in time) split_time.push(time[t].split(' ')[1])
-        
+            for (let t in time) split_time.push(time[t].split(' ')[1])
+
             flags = response.flags;
+            skipped_or_rejected_flags = response.skipped_or_rejected_flags;
             var ctx = document.getElementById('container-graph-canvas').getContext('2d');
             console.log(split_time);
             console.log(flags);
-    chart = new Chart(ctx,{
-            type: 'line',
-            data: {
-                labels: split_time,
-                datasets: [{
-                    label: 'Count Accepted flags',
-                    data: flags,
-                    backgroundColor: 'rgba(0,250,0,0.2)',
-                    borderColor: 'rgba(0,200,0,1)',
-                    borderWidth: 3,
-                    tension: 0.5
-                }]
-            },
-            options: {
-                
-            }
-        }
-    );
-    chart.render();
-            
-    });
-}
+            chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: split_time,
+                        datasets: [
+                            {
+                                label: 'Count Accepted flags',
+                                data: flags,
+                                backgroundColor: 'rgba(75,192,192,0.2)',
+                                borderColor: 'rgba(75,192,192,1)',
+                                borderWidth: 2,
+                                pointBackgroundColor: 'rgba(75,192,192,1)',
+                                pointBorderColor: 'rgba(75,192,192,1)',
+                                tension: 0.4,
+                                pointRadius: 5,
+                            },
+                            {
+                                label: 'Count Skipped/Rejected flags',
+                                data: skipped_or_rejected_flags,
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 2,
+                                pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                                pointBorderColor: 'rgba(255, 99, 132, 1)',
+                                tension: 0.4,
+                                pointRadius: 5,
+                            }
+                        ]
+                    },
+                    options: {}
+                }
+            );
+            chart.render();
 
+        });
+}
 
 
 $(function () {
@@ -210,7 +222,7 @@ $(function () {
         setPageNumber(1);
         showFlags();
         chart.destroy();
-        $('.btn-show-graph').attr('disabled',false)
+        $('.btn-show-graph').attr('disabled', false)
     });
 
     $('#post-flags-manual-form').submit(function (event) {
@@ -221,7 +233,7 @@ $(function () {
     $('.btn-show-graph').click(() => {
         $('.search-results').css('display', 'none');
         setTimeout(() => {
-            showGraphic();    
-        },250);
+            showGraphic();
+        }, 250);
     });
 });

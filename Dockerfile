@@ -13,5 +13,5 @@ RUN pip install -r requirements.txt
 EXPOSE 1234
 
 # Command to run the Flask application
-CMD [ "sh", "-c", "FLASK_APP=/server/standalone.py FLASK_DEBUG=True python3 -m flask run --host 0.0.0.0 --port 1234 --with-threads" ]
+CMD [ "sh", "-c", "FLASK_APP=/server/standalone.py python3 -m flask run --host 0.0.0.0 --port 1234 --with-threads" ]
 

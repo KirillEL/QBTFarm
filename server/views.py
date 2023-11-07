@@ -48,27 +48,42 @@ def get_info():
         sql_time_info = curs.fetchall()
     all_times = []
     flags = []
-    for item in sql_time_info:
-        
-        dt = datetime.fromtimestamp(item[0])
+    skipped_or_rejected_flags = []
+    for row in sql_time_info:
+        timestamp = row['time']
+
+        dt = datetime.fromtimestamp(timestamp)
         t = dt.strftime('%Y-%m-%d %H:%M:%S')
         all_times.append(t)
-        
 
     uniq_times = list(set(all_times))
     uniq_times.sort()
+    count = 0
+    count_skipped_or_rejected_flags = 0
     for item in uniq_times:
-        query_2 = 'SELECT COUNT(*) FROM flags where flags.status="ACCEPTED" and flags.Time="{}" ORDER BY flags.Time'.format(time.mktime(time.strptime(item, '%Y-%m-%d %H:%M:%S')))
+        query_2 = 'SELECT COUNT(*) FROM flags where flags.status=%s and flags.Time=%s GROUP BY flags.Time'
+        query_3 = 'SELECT COUNT(*) FROM flags where flags.status=%s and flags.Time=%s GROUP BY flags.Time'
         with db_cursor() as (conn, curs):
-            curs.execute(query_2)
+            curs.execute(query_2, ('ACCEPTED', time.mktime(time.strptime(item, '%Y-%m-%d %H:%M:%S'))))
             count_flags_for_time = curs.fetchall()
-        
+
+            curs.execute(query_3, ('SKIPPED', time.mktime(time.strptime(item, '%Y-%m-%d %H:%M:%S'))))
+            count_skipped_or_rejected_flags_for_time = curs.fetchall()
+
+
+
         for i in count_flags_for_time:
-            flags.append(i[0])
-    
+            count += i['count']
+
+        for j in count_skipped_or_rejected_flags_for_time:
+            count_skipped_or_rejected_flags += j['count']
+
+        flags.append(count)
+        skipped_or_rejected_flags.append(count_skipped_or_rejected_flags)
     return jsonify({
         'time': uniq_times,
-        'flags': flags
+        'flags': flags,
+        'skipped_or_rejected_flags': skipped_or_rejected_flags
     })
 
 
