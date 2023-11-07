@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 services:
   web:
     container_name: qbt-server
@@ -8,7 +8,25 @@ services:
     environment:
       - FLASK_DEBUG=True
     command: sh -c "FLASK_APP=/server/standalone.py FLASK_DEBUG=True python3 -m flask run --host 0.0.0.0 --port 1234 --with-threads"
+    restart: unless-stopped
+    depends_on:
+      - postgres
 
-
-  
+  postgres:
+    image: postgres:14.1-alpine
+    restart: unless-stopped
+    container_name: qbt_db
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./vol/db:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U postgres -d qbt_farm
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 

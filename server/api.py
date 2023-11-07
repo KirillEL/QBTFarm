@@ -3,6 +3,7 @@ import time
 from flask import request, jsonify
 
 from server import app, auth, database, reloader
+from server.database import db_cursor
 from server.models import FlagStatus
 from server.spam import is_spam_flag
 
@@ -26,8 +27,9 @@ def post_flags():
             for item in flags]
 
     db = database.get()
-    db.executemany("INSERT OR IGNORE INTO flags (flag, sploit, team, time, status) "
+    with db_cursor() as (conn, curs):
+        curs.executemany("INSERT OR IGNORE INTO flags (flag, sploit, team, time, status) "
                    "VALUES (?, ?, ?, ?, ?)", rows)
-    db.commit()
+        conn.commit()
 
     return ''

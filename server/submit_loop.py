@@ -7,7 +7,7 @@ from collections import defaultdict
 
 from server import app, database, reloader
 from server.models import Flag, FlagStatus, SubmitResult
-
+from database import db_cursor
 
 def get_fair_share(groups, limit):
     if not groups:
@@ -54,8 +54,6 @@ def submit_flags(flags, config):
 
 def run_loop():
     app.logger.info('Starting submit loop')
-    with app.app_context():
-        db = database.get(context_bound=False)
 
     while True:
         submit_start_time = time.time()
@@ -63,12 +61,13 @@ def run_loop():
         config = reloader.get_config()
 
         skip_time = round(submit_start_time - config['FLAG_LIFETIME'])
-        db.execute("UPDATE flags SET status = ? WHERE status = ? AND time < ?",
+        with db_cursor() as (conn, curs):
+            curs.execute("UPDATE flags SET status = %s WHERE status = %s AND time < %s",
                    (FlagStatus.SKIPPED.name, FlagStatus.QUEUED.name, skip_time))
-        db.commit()
+            conn.commit()
 
-        cursor = db.execute("SELECT * FROM flags WHERE status = ?", (FlagStatus.QUEUED.name,))
-        queued_flags = [Flag(**item) for item in cursor.fetchall()]
+            curs.execute("SELECT * FROM flags WHERE status = %s", (FlagStatus.QUEUED.name,))
+            queued_flags = [Flag(**item) for item in curs.fetchall()]
 
         if queued_flags:
             grouped_flags = defaultdict(list)
@@ -80,9 +79,10 @@ def run_loop():
             results = submit_flags(flags, config)
 
             rows = [(item.status.name, item.checksystem_response, item.flag) for item in results]
-            db.executemany("UPDATE flags SET status = ?, checksystem_response = ? "
-                           "WHERE flag = ?", rows)
-            db.commit()
+            with db_cursor() as (conn, curs):
+                curs.executemany("UPDATE flags SET status = %s, checksystem_response = %s"
+                           "WHERE flag = %s", rows)
+                conn.commit()
 
         submit_spent = time.time() - submit_start_time
         if config['SUBMIT_PERIOD'] > submit_spent:

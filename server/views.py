@@ -5,6 +5,7 @@ from datetime import datetime
 from flask import jsonify, render_template, request
 
 from server import app, auth, database, reloader
+from server.database import db_cursor
 from server.models import FlagStatus
 
 
@@ -18,7 +19,9 @@ def timestamp_to_datetime(s):
 def index():
     distinct_values = {}
     for column in ['sploit', 'status', 'team']:
-        rows = database.query('SELECT DISTINCT {} FROM flags ORDER BY {}'.format(column, column))
+        with db_cursor() as (conn, curs):
+            curs.execute('SELECT DISTINCT {} FROM flags ORDER BY {}'.format(column, column))
+            rows = curs.fetchall()
         distinct_values[column] = [item[column] for item in rows]
 
     config = reloader.get_config()
@@ -40,7 +43,9 @@ FLAGS_PER_PAGE = 30
 @app.route('/ui/get_info', methods=['GET'])
 def get_info():
     query_1 = 'SELECT Time from flags ORDER BY flags.Time'
-    sql_time_info = database.query(query_1)
+    with db_cursor() as (conn, curs):
+        curs.execute(query_1)
+        sql_time_info = curs.fetchall()
     all_times = []
     flags = []
     for item in sql_time_info:
@@ -54,7 +59,9 @@ def get_info():
     uniq_times.sort()
     for item in uniq_times:
         query_2 = 'SELECT COUNT(*) FROM flags where flags.status="ACCEPTED" and flags.Time="{}" ORDER BY flags.Time'.format(time.mktime(time.strptime(item, '%Y-%m-%d %H:%M:%S')))
-        count_flags_for_time = database.query(query_2)
+        with db_cursor() as (conn, curs):
+            curs.execute(query_2)
+            count_flags_for_time = curs.fetchall()
         
         for i in count_flags_for_time:
             flags.append(i[0])
@@ -72,17 +79,17 @@ def show_flags():
     for column in ['sploit', 'status', 'team']:
         value = request.form[column]
         if value:
-            conditions.append(('{} = ?'.format(column), value))
+            conditions.append((f'{column} = %s', value))
     for column in ['flag', 'checksystem_response']:
         value = request.form[column]
         if value:
-            conditions.append(('INSTR(LOWER({}), ?)'.format(column), value.lower()))
+            conditions.append((f'POSITION(%s in LOWER({column})) > 0', value.lower()))
     for param in ['time-since', 'time-until']:
         value = request.form[param].strip()
         if value:
             timestamp = round(datetime.strptime(value, FORM_DATETIME_FORMAT).timestamp())
             sign = '>=' if param == 'time-since' else '<='
-            conditions.append(('time {} ?'.format(sign), timestamp))
+            conditions.append((f'time {sign} %s', timestamp))
     page_number = int(request.form['page-number'])
     if page_number < 1:
         raise ValueError('Invalid page-number')
@@ -95,19 +102,27 @@ def show_flags():
         conditions_sql = ''
         conditions_args = []
 
-    sql = 'SELECT * FROM flags ' + conditions_sql + ' ORDER BY time DESC LIMIT ? OFFSET ?'
+    sql = 'SELECT * FROM flags ' + conditions_sql + ' ORDER BY time DESC LIMIT %s OFFSET %s'
     args = conditions_args + [FLAGS_PER_PAGE, FLAGS_PER_PAGE * (page_number - 1)]
-    flags = database.query(sql, args)
+    with db_cursor() as (conn, curs):
+        curs.execute(sql, args)
+        flags = curs.fetchall()
 
     sql = 'SELECT COUNT(*) FROM flags ' + conditions_sql
     args = conditions_args
-    total_count = database.query(sql, args)[0][0]
+    with db_cursor() as (conn, curs):
+        curs.execute(sql, args)
+        total_count = curs.fetchone()['count']
 
-    sql_accepted = 'SELECT COUNT(*) FROM flags where flags.status="ACCEPTED"'
-    total_accepted_count = database.query(sql_accepted)[0][0]
+    sql_accepted = 'SELECT COUNT(*) FROM flags where flags.status=%s'
+    with db_cursor() as (conn, curs):
+        curs.execute(sql_accepted, ('ACCEPTED',))
+        total_accepted_count = curs.fetchone()['count']
     
-    sql_skipped = 'SELECT COUNT(*) FROM flags where flags.status="SKIPPED" OR flags.status="QUEUED"'
-    total_skipped_count = database.query(sql_skipped)[0][0]
+    sql_skipped = 'SELECT COUNT(*) FROM flags where flags.status=%s OR flags.status=%s'
+    with db_cursor() as (conn, curs):
+        curs.execute(sql_skipped, ('QUEUED', 'SKIPPED',))
+        total_skipped_count = curs.fetchone()['count']
     
     return jsonify({
         'rows': [dict(item) for item in flags],
@@ -130,9 +145,13 @@ def post_flags_manual():
     rows = [(item, 'Manual', '*', cur_time, FlagStatus.QUEUED.name)
             for item in flags]
 
-    db = database.get()
-    db.executemany("INSERT OR IGNORE INTO flags (flag, sploit, team, time, status) "
-                   "VALUES (?, ?, ?, ?, ?)", rows)
-    db.commit()
+    with db_cursor() as (conn, curs):
+        for row in rows:
+            curs.execute("""
+                INSERT INTO flags (flag, sploit, team, time, status)
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT (flag) DO NOTHING
+                """, row)
+        conn.commit()
 
     return ''

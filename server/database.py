@@ -1,77 +1,54 @@
-"""
-Module with SQLite helpers, see http://flask.pocoo.org/docs/0.12/patterns/sqlite3/
-"""
-
-import os
-import sqlite3
+import logging
 import threading
+from contextlib import contextmanager
 
-from flask import g
+from psycopg2 import pool, extras
 
-from server import app
+from constants import SCHEMA_PATH, POSTGRES_DSN
 
-
-schema_path = os.path.join(os.path.dirname(__file__), 'schema.sql')
-
-if "FLAGS_DATABASE" in os.environ:
-    db_filename = os.environ["FLAGS_DATABASE"]
-else:
-    db_filename = os.path.join(os.path.dirname(__file__), 'flags.sqlite')
+logger = logging.getLogger(__name__)
 
 
-_init_started = False
-_init_lock = threading.RLock()
+class DBPool:
+    _lock = threading.RLock()
+    _value = None
+
+    @staticmethod
+    def create():
+        p = pool.ThreadedConnectionPool(
+            minconn=5,
+            maxconn=20,
+            dsn=POSTGRES_DSN,
+        )
+        conn = p.getconn()
+        logger.info("Initializing db schema")
+        try:
+            with conn.cursor() as curs:
+                curs.execute(SCHEMA_PATH.read_text())
+                conn.commit()
+        finally:
+            p.putconn(conn)
+        return p
+
+    @classmethod
+    def get(cls):
+        with cls._lock:
+            if cls._value is None:
+                cls._value = cls.create()
+        return cls._value
 
 
-def _init(database):
-    app.logger.info('Creating database schema')
-    with app.open_resource(schema_path, 'r') as f:
-        database.executescript(f.read())
+@contextmanager
+def db_cursor(dict_cursor: bool = True):
+    db_pool = DBPool.get()
+    conn = db_pool.getconn()
 
-
-def get(context_bound=True):
-    """
-    If there is no opened connection to the SQLite database in the context
-    of the current request or if context_bound=False, get() opens a new
-    connection to the SQLite database. Reopening the connection on each request
-    does not have a big overhead, but allows to avoid implementing a pool of
-    thread-local connections (see https://stackoverflow.com/a/14520670).
-
-    If the database did not exist, get() creates and initializes it.
-    If get() is called from other threads at this time, they will wait
-    for the end of the initialization.
-
-    If context_bound=True, the connection will be closed after
-    request handling (when the context will be destroyed).
-
-    :returns: a connection to the initialized SQLite database
-    """
-
-    global _init_started
-
-    if context_bound and 'database' in g:
-        return g.database
-
-    need_init = not os.path.exists(db_filename)
-    database = sqlite3.connect(db_filename)
-    database.row_factory = sqlite3.Row
-
-    if need_init:
-        with _init_lock:
-            if not _init_started:
-                _init_started = True
-                _init(database)
-
-    if context_bound:
-        g.database = database
-    return database
-
-
-def query(sql, args=()):
-    return get().execute(sql, args).fetchall()
-
-
-@app.teardown_appcontext
-def close(_):
-    if 'database' in g:
-        g.database.close()
+    if dict_cursor:
+        curs = conn.cursor(cursor_factory=extras.RealDictCursor)
+    else:
+        curs = conn.cursor()
+    try:
+        yield conn, curs
+    finally:
+        curs.close()
+        db_pool.putconn(conn)
