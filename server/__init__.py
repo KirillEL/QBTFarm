@@ -12,3 +12,4 @@ for handler in app.logger.handlers:
 
 import server.api
 import server.views
+import server.config
