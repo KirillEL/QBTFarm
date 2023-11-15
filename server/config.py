@@ -7,6 +7,10 @@ CONFIG = {
     # 'SYSTEM_HOST': '127.0.0.1',
     # 'SYSTEM_PORT': 31337,
 
+    # 'SYSTEM_PROTOCOL': 'sibirctf_http',
+    # 'SYSTEM_HOST': '127.0.0.1',
+    # 'SYSTEM_TOKEN': 'TOKEN',
+
     'SYSTEM_PROTOCOL': 'ructf_http',
     'SYSTEM_URL': 'http://10.20.0.2:8080/flags',
     'SYSTEM_TOKEN': '14_cbdcb7fbc607f88d',
