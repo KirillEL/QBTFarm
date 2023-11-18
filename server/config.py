@@ -32,7 +32,7 @@ CONFIG = {
 
     
     'SERVER_USERNAME': 'qarabag69',    
-    'SERVER_PASSWORD': '$ra01vz&q10',
+    'SERVER_PASSWORD': 'e28eb74f-4bf3-4f48-98ee-d694cca35553',
 
     # Use authorization for API requests (хуйня не понимаю что это такое вообще)
     'ENABLE_API_AUTH': False,
