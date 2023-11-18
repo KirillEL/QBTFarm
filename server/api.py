@@ -20,16 +20,17 @@ def get_config():
 @auth.api_auth_required
 def post_flags():
     flags = request.get_json()
+    print(flags)
     flags = [item for item in flags if not is_spam_flag(item['flag'])]
 
     cur_time = round(time.time())
     rows = [(item['flag'], item['sploit'], item['team'], cur_time, FlagStatus.QUEUED.name)
             for item in flags]
 
-    db = database.get()
     with db_cursor() as (conn, curs):
-        curs.executemany("INSERT OR IGNORE INTO flags (flag, sploit, team, time, status) "
-                   "VALUES (?, ?, ?, ?, ?)", rows)
+        curs.executemany("""
+        INSERT INTO flags (flag, sploit, team, time, status) VALUES (%s, %s, %s, %s, %s)
+        """, rows)
         conn.commit()
 
     return ''
