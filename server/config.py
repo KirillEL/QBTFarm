@@ -12,7 +12,7 @@ CONFIG = {
     # 'SYSTEM_TOKEN': 'TOKEN',
 
     'SYSTEM_PROTOCOL': 'ructf_http',
-    'SYSTEM_URL': 'http://10.20.0.2:8080/flag',
+    'SYSTEM_URL': 'http://10.10.255.3:80/flag',
     'SYSTEM_TOKEN': '14_cbdcb7fbc607f88d',
 
     # 'SYSTEM_PROTOCOL': 'volgactf',
