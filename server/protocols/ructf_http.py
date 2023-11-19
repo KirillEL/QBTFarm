@@ -25,7 +25,7 @@ def submit_flags(flags, config):
     for item in flags:
 
         r = requests.get(config['SYSTEM_URL'],
-                         params={'teamid': 'qarabagteam', 'flag': item},
+                         params={'teamid': 't11', 'flag': item},
                          timeout=TIMEOUT)
 
         response_status = r.status_code
