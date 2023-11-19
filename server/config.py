@@ -1,7 +1,7 @@
 CONFIG = {
-    'TEAMS': {'Team #{}'.format(i): '10.0.{}.1'.format(i)
-              for i in range(1, 20)},
-    'FLAG_FORMAT': r'[A-Z0-9]{31}=',
+    'TEAMS': {'Team #{}'.format(i): '10.10.{}.1'.format(i)
+              for i in range(1, 12)},
+    'FLAG_FORMAT': r'c01d[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}[0-9]{8}',
 
     # 'SYSTEM_PROTOCOL': 'ructf_tcp',
     # 'SYSTEM_HOST': '127.0.0.1',
@@ -12,7 +12,7 @@ CONFIG = {
     # 'SYSTEM_TOKEN': 'TOKEN',
 
     'SYSTEM_PROTOCOL': 'ructf_http',
-    'SYSTEM_URL': 'http://10.20.0.2:8080/flags',
+    'SYSTEM_URL': 'http://10.20.0.2:8080/flag',
     'SYSTEM_TOKEN': '14_cbdcb7fbc607f88d',
 
     # 'SYSTEM_PROTOCOL': 'volgactf',
