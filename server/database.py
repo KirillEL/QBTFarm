@@ -3,7 +3,6 @@ import threading
 from contextlib import contextmanager
 
 from psycopg2 import pool, extras
-
 from constants import SCHEMA_PATH, POSTGRES_DSN
 
 logger = logging.getLogger(__name__)

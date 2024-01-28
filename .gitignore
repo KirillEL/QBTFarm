@@ -1,3 +1,4 @@
 vol/
 .env
 .idea/
+server/.env

@@ -30,9 +30,6 @@ CONFIG = {
     'SUBMIT_PERIOD': 21,
     'FLAG_LIFETIME': 1*60,
 
-    
-    'SERVER_USERNAME': 'q69',    
-    'SERVER_PASSWORD': 'e28eb74f-4bf3-4f48-98ee-d694cca35553',
 
     # Use authorization for API requests (хуйня не понимаю что это такое вообще)
     'ENABLE_API_AUTH': False,

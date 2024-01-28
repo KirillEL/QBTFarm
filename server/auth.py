@@ -1,6 +1,6 @@
 from functools import wraps
 from flask import request, Response
-
+import os
 from server import reloader
 
 
@@ -15,8 +15,8 @@ def auth_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         auth = request.authorization
-        config = reloader.get_config()
-        if auth is None or (auth.password != config['SERVER_PASSWORD'] or auth.username != config['SERVER_USERNAME']):
+        server_login, server_password = os.getenv('SERVER_LOGIN'), os.getenv('SERVER_PASSWORD')
+        if auth is None or (auth.password != server_password or auth.username != server_login):
             return authenticate()
         return f(*args, **kwargs)
     return decorated
