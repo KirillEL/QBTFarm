@@ -12,7 +12,7 @@ CONFIG = {
     # 'SYSTEM_TOKEN': 'TOKEN',
 
     'SYSTEM_PROTOCOL': 'ructf_http',
-    'SYSTEM_URL': 'http://10.20.0.4:80/flags',
+    'SYSTEM_URL': 'http://84.201.154.141:80/flags',
     'SYSTEM_TOKEN': '14_cbdcb7fbc607f88d',
 
     # 'SYSTEM_PROTOCOL': 'volgactf',
@@ -27,8 +27,8 @@ CONFIG = {
     # every SUBMIT_PERIOD seconds. Flags received more than
     # FLAG_LIFETIME seconds ago will be skipped.
     'SUBMIT_FLAG_LIMIT': 20,
-    'SUBMIT_PERIOD': 21,
-    'FLAG_LIFETIME': 1*60,
+    'SUBMIT_PERIOD': 60,
+    'FLAG_LIFETIME': 5*60,
 
 
     # Use authorization for API requests (хуйня не понимаю что это такое вообще)
