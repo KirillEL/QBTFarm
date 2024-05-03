@@ -2,3 +2,4 @@ vol/
 .env
 .idea/
 server/.env
+__pycache__
