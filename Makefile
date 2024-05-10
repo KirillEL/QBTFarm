@@ -20,3 +20,7 @@ reset: stop clean
 .PHONY: logs
 logs:
 	docker compose logs -f
+
+.PHONY: clear_bad_flags
+clear_bad_flags:
+	python3 clear_bad_flags.py

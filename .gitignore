@@ -3,3 +3,4 @@ vol/
 .idea/
 server/.env
 __pycache__
+server/.env

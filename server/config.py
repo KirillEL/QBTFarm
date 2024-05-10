@@ -1,6 +1,6 @@
 CONFIG = {
-    'TEAMS': {'Team #{}'.format(i): '10.20.{}.4'.format(i)
-              for i in range(1, 23)},
+    'TEAMS': {'Team #{}'.format(i): '10.80.{}.2'.format(i)
+              for i in range(1,16)},
     'FLAG_FORMAT': r'[A-Z0-9]{31}=',
 
     # 'SYSTEM_PROTOCOL': 'ructf_tcp',
@@ -12,8 +12,12 @@ CONFIG = {
     # 'SYSTEM_TOKEN': 'TOKEN',
 
     'SYSTEM_PROTOCOL': 'ructf_http',
-    'SYSTEM_URL': 'http://84.201.154.141:80/flags',
+    'SYSTEM_URL': 'http://10.8.0.2:80/flags',
     'SYSTEM_TOKEN': '14_cbdcb7fbc607f88d',
+    
+    # 'SYSTEM_PROTOCOL': 'custom_http',
+    # 'SYSTEM_URL': '',
+    # 'SYSTEM_TOKEN': '',
 
     # 'SYSTEM_PROTOCOL': 'volgactf',
     # 'SYSTEM_HOST': '127.0.0.1',
@@ -32,6 +36,6 @@ CONFIG = {
 
 
     # Use authorization for API requests (хуйня не понимаю что это такое вообще)
-    'ENABLE_API_AUTH': False,
-    'API_TOKEN': '00000000000000000000'
+    'ENABLE_API_AUTH': True,
+    'API_TOKEN': 'QBT'
 }

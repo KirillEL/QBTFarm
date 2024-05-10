@@ -29,7 +29,7 @@ def post_flags():
 
     with db_cursor() as (conn, curs):
         curs.executemany("""
-        INSERT INTO flags (flag, sploit, team, time, status) VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO flags (flag, sploit, team, time, status) VALUES (%s, %s, %s, %s, %s) ON CONFLICT (flag) DO NOTHING
         """, rows)
         conn.commit()
 
