@@ -1,6 +1,5 @@
 CONFIG = {
-    'TEAMS': {'Team #{}'.format(i): '10.80.{}.2'.format(i)
-              for i in range(1,16)},
+    'TEAMS': {f'Team #{i}': f'10.0.{i}.2' for i in range(1,15) if f'10.0.{i}.2' != '10.0.9.2'},
     'FLAG_FORMAT': r'[A-Z0-9]{31}=',
 
     # 'SYSTEM_PROTOCOL': 'ructf_tcp',
