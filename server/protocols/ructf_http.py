@@ -12,8 +12,6 @@ RESPONSES = {
         "is not up",
         "no such flag",
     ],
-    FlagStatus.SKIPPED: 
-        ["timeout"],
     FlagStatus.ACCEPTED: ["accepted", "congrat"],
     FlagStatus.REJECTED: [
         "bad",

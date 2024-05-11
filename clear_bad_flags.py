@@ -10,7 +10,7 @@ DB_PASSWORD = os.getenv('POSTGRES_PASSWORD')
 DB_USER = "postgres"
 DB_DB = os.getenv('POSTGRES_DB')
 
-sql_command = "delete from flags where flags.status='SKIPPED' OR flags.status='REJECTED';"
+sql_command = "delete from flags where flags.status='SKIPPED' OR flags.status='REJECTED' OR flags.status='QUEUED';"
 
 container_name = "qbt_db"
 

@@ -59,7 +59,6 @@ def run_loop():
         submit_start_time = time.time()
 
         config = reloader.get_config()
-
         skip_time = round(submit_start_time - config['FLAG_LIFETIME'])
         with db_cursor() as (conn, curs):
             curs.execute("UPDATE flags SET status = %s WHERE status = %s AND time < %s",

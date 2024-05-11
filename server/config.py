@@ -29,9 +29,9 @@ CONFIG = {
     # The server will submit not more than SUBMIT_FLAG_LIMIT flags
     # every SUBMIT_PERIOD seconds. Flags received more than
     # FLAG_LIFETIME seconds ago will be skipped.
-    'SUBMIT_FLAG_LIMIT': 20,
-    'SUBMIT_PERIOD': 60,
-    'FLAG_LIFETIME': 5*60,
+    'SUBMIT_FLAG_LIMIT': 30,
+    'SUBMIT_PERIOD': 10,
+    'FLAG_LIFETIME': 2*10,
 
 
     # Use authorization for API requests (хуйня не понимаю что это такое вообще)

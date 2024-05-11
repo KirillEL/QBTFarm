@@ -41,19 +41,19 @@ function generateFlagTableRows(rows) {
         if (item?.status === 'ACCEPTED') {
             html += '<tr style="box-shadow:inset 0px 0px 5px 5px rgba(0,200,0,0.5);">';
             cells.forEach(function (text) {
-                html += '<td style="font-weight:700;">' + escapeHtml(text) + '</td>';
+                html += '<td style="font-weight:700;font-size:10px;">' + escapeHtml(text) + '</td>';
             });
             html += '</tr>';
         } else if (item?.status === 'QUEUED') {
             html += '<tr style="box-shadow:inset 0px 0px 5px 5px rgba(0,0,0,0.5);">';
             cells.forEach(function (text) {
-                html += '<td style="font-weight:700;">' + escapeHtml(text) + '</td>';
+                html += '<td style="font-weight:700;font-size:10px;">' + escapeHtml(text) + '</td>';
             });
             html += '</tr>';
         } else {
             html += '<tr style="box-shadow:inset 0px 0px 5px 5px rgba(200,0,0,0.5);">';
             cells.forEach(function (text) {
-                html += '<td style="font-weight:700;">' + escapeHtml(text) + '</td>';
+                html += '<td style="font-weight:700;font-size:10px;">' + escapeHtml(text) + '</td>';
             });
             html += '</tr>';
         }
@@ -177,36 +177,36 @@ function showGraphic() {
             console.log(split_time);
             console.log(flags);
             chart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: split_time,
-                        datasets: [
-                            {
-                                label: 'Count Accepted flags',
-                                data: flags,
-                                backgroundColor: 'rgba(75,192,192,0.2)',
-                                borderColor: 'rgba(75,192,192,1)',
-                                borderWidth: 2,
-                                pointBackgroundColor: 'rgba(75,192,192,1)',
-                                pointBorderColor: 'rgba(75,192,192,1)',
-                                tension: 0.4,
-                                pointRadius: 5,
-                            },
-                            {
-                                label: 'Count Skipped/Rejected flags',
-                                data: skipped_or_rejected_flags,
-                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                borderWidth: 2,
-                                pointBackgroundColor: 'rgba(255, 99, 132, 1)',
-                                pointBorderColor: 'rgba(255, 99, 132, 1)',
-                                tension: 0.4,
-                                pointRadius: 5,
-                            }
-                        ]
-                    },
-                    options: {}
-                }
+                type: 'line',
+                data: {
+                    labels: split_time,
+                    datasets: [
+                        {
+                            label: 'Count Accepted flags',
+                            data: flags,
+                            backgroundColor: 'rgba(75,192,192,0.2)',
+                            borderColor: 'rgba(75,192,192,1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(75,192,192,1)',
+                            pointBorderColor: 'rgba(75,192,192,1)',
+                            tension: 0.4,
+                            pointRadius: 5,
+                        },
+                        {
+                            label: 'Count Skipped/Rejected flags',
+                            data: skipped_or_rejected_flags,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                            pointBorderColor: 'rgba(255, 99, 132, 1)',
+                            tension: 0.4,
+                            pointRadius: 5,
+                        }
+                    ]
+                },
+                options: {}
+            }
             );
             chart.render();
 
