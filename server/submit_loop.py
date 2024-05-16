@@ -9,6 +9,7 @@ from server import app, database, reloader
 from server.models import Flag, FlagStatus, SubmitResult
 from database import db_cursor
 
+
 def get_fair_share(groups, limit):
     if not groups:
         return []
@@ -42,51 +43,66 @@ def get_fair_share(groups, limit):
 
 
 def submit_flags(flags, config):
-    module = importlib.import_module('server.protocols.' + config['SYSTEM_PROTOCOL'])
+    module = importlib.import_module("server.protocols." + config["SYSTEM_PROTOCOL"])
 
     try:
         return list(module.submit_flags(flags, config))
     except Exception as e:
-        message = '{}: {}'.format(type(e).__name__, str(e))
-        app.logger.exception('Exception on submitting flags')
+        message = "{}: {}".format(type(e).__name__, str(e))
+        app.logger.exception("Exception on submitting flags")
         return [SubmitResult(item.flag, FlagStatus.QUEUED, message) for item in flags]
 
 
 def run_loop():
-    app.logger.info('Starting submit loop')
+    app.logger.info("Starting submit loop")
 
     while True:
         submit_start_time = time.time()
 
         config = reloader.get_config()
-        skip_time = round(submit_start_time - config['FLAG_LIFETIME'])
+        skip_time = round(submit_start_time - config["FLAG_LIFETIME"])
         with db_cursor() as (conn, curs):
-            curs.execute("UPDATE flags SET status = %s WHERE status = %s AND time < %s",
-                   (FlagStatus.SKIPPED.name, FlagStatus.QUEUED.name, skip_time))
+            curs.execute(
+                "UPDATE flags SET status = %s WHERE status = %s AND time < %s",
+                (FlagStatus.SKIPPED.name, FlagStatus.QUEUED.name, skip_time),
+            )
             conn.commit()
 
-            curs.execute("SELECT * FROM flags WHERE status = %s", (FlagStatus.QUEUED.name,))
+            curs.execute(
+                "SELECT * FROM flags WHERE status = %s", (FlagStatus.QUEUED.name,)
+            )
             queued_flags = [Flag(**item) for item in curs.fetchall()]
 
         if queued_flags:
             grouped_flags = defaultdict(list)
             for item in queued_flags:
                 grouped_flags[item.sploit, item.team].append(item)
-            flags = get_fair_share(grouped_flags.values(), config['SUBMIT_FLAG_LIMIT'])
+            flags = get_fair_share(grouped_flags.values(), config["SUBMIT_FLAG_LIMIT"])
 
-            app.logger.debug('Submitting %s flags (out of %s in queue)', len(flags), len(queued_flags))
+            app.logger.debug(
+                "Submitting %s flags (out of %s in queue)",
+                len(flags),
+                len(queued_flags),
+            )
             results = submit_flags(flags, config)
 
-            rows = [(item.status.name, item.checksystem_response, item.flag) for item in results]
+            rows = [
+                (item.status.name, item.checksystem_response, item.flag)
+                for item in results
+            ]
             with db_cursor() as (conn, curs):
-                curs.executemany("UPDATE flags SET status = %s, checksystem_response = %s"
-                           "WHERE flag = %s", rows)
+                curs.executemany(
+                    "UPDATE flags SET status = %s, checksystem_response = %s"
+                    "WHERE flag = %s",
+                    rows,
+                )
                 conn.commit()
 
         submit_spent = time.time() - submit_start_time
-        if config['SUBMIT_PERIOD'] > submit_spent:
-            time.sleep(config['SUBMIT_PERIOD'] - submit_spent)
+        if config["SUBMIT_PERIOD"] > submit_spent:
+            time.sleep(config["SUBMIT_PERIOD"] - submit_spent)
 
 
 if __name__ == "__main__":
+    app.logger.error("HEREEEE!")
     run_loop()

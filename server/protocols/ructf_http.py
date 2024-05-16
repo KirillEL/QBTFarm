@@ -31,6 +31,7 @@ TIMEOUT = 5
 
 
 def submit_flags(flags, config):
+    app.logger.error("I AM HEREEEEE!")
     r = requests.put(
         config["SYSTEM_URL"],
         headers={"X-Team-Token": config["SYSTEM_TOKEN"]},
@@ -53,7 +54,8 @@ def submit_flags(flags, config):
             if response not in unknown_responses:
                 unknown_responses.add(response)
                 app.logger.warning(
-                    "Unknown checksystem response (flag will be resent): %s", response
+                    "Unknown checksystem response (flag will be resent): %s",
+                    response,
                 )
 
         yield SubmitResult(item["flag"], found_status, response)

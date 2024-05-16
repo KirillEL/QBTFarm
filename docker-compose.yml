@@ -1,14 +1,25 @@
 version: '3.8'
 services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx-proxy
+    ports:
+      - "2222:2222"
+    volumes:
+      - "./nginx/nginx.conf:/etc/nginx/nginx.conf"
+    depends_on:
+      - web
+    restart: unless-stopped
+
   web:
     container_name: qbt-server
     build: .
     ports:
       - "1234:1234"
-    environment:
-      - FLASK_DEBUG=True
-    command: sh -c "FLASK_APP=/server/standalone.py python3 -m flask run --host 0.0.0.0 --port 1234 --with-threads"
-    restart: unless-stopped
+    # environment:
+    #   - FLASK_DEBUG=True
+    command: sh -c "/server/entrypoint.sh"
+    restart: always
     volumes:
       - ./server:/server
     depends_on:
@@ -16,7 +27,7 @@ services:
 
   postgres:
     image: postgres:14.1-alpine
-    restart: unless-stopped
+    restart: always
     container_name: qbt_db
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST}
@@ -25,12 +36,12 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: pg_isready -U postgres -d qbt_farm
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+    # healthcheck:
+    #   test: pg_isready -U postgres -d qbt_farm
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 30s
 
 volumes:
   postgres-data: {}

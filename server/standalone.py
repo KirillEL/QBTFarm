@@ -1,11 +1,17 @@
 import threading
 import werkzeug.serving
 
-
 from server import app
 import server.submit_loop
+from server.submit_loop import run_loop
+
+
+def start_submit_loop():
+    app.logger.info("Starting submit loop thread")
+    thread = threading.Thread(target=run_loop, daemon=True)
+    thread.start()
+    return thread
 
 
 if not werkzeug.serving.is_running_from_reloader():
-    threading.Thread(target=server.submit_loop.run_loop, daemon=True).start()
-    # FIXME: Don't use daemon=True, exit from the thread properly
+    submit_thread = start_submit_loop()
