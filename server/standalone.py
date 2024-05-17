@@ -14,4 +14,4 @@ def start_submit_loop():
 
 
 if not werkzeug.serving.is_running_from_reloader():
-    submit_thread = start_submit_loop()
+    start_submit_loop()

@@ -5,6 +5,7 @@ from flask import Flask
 
 app = Flask(__name__)
 
+
 app.logger.setLevel(logging.DEBUG)
 for handler in app.logger.handlers:
     handler.setLevel(logging.DEBUG)
@@ -15,4 +16,4 @@ import server.views
 
 from server.config import CONFIG
 
-__all__ = ['CONFIG']
+__all__ = ["CONFIG"]

@@ -7,7 +7,7 @@ from collections import defaultdict
 
 from server import app, database, reloader
 from server.models import Flag, FlagStatus, SubmitResult
-from database import db_cursor
+from database import DBPool, db_cursor
 
 
 def get_fair_share(groups, limit):
@@ -104,5 +104,4 @@ def run_loop():
 
 
 if __name__ == "__main__":
-    app.logger.error("HEREEEE!")
     run_loop()
